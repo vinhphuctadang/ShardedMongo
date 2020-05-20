@@ -1,0 +1,56 @@
+version: '2'
+services:
+  ## 1 Config Servers
+  config01:
+    image: mongo:latest
+    command: mongod --port 27017 --configsvr --replSet configserver
+    volumes:
+      - ./scripts:/scripts
+  ## 3 Shards
+  shard01a:
+    image: mongo:latest
+    command: mongod --port 27018 --shardsvr --replSet shard01
+    volumes:
+      - ./scripts:/scripts
+  shard01b:
+    image: mongo:latest
+    command: mongod --port 27018 --shardsvr --replSet shard01
+    volumes:
+      - ./scripts:/scripts
+  shard02a:
+    image: mongo:latest
+    command: mongod --port 27019 --shardsvr --replSet shard02
+    volumes:
+      - ./scripts:/scripts
+  shard02b:
+    image: mongo:latest
+    command: mongod --port 27019 --shardsvr --replSet shard02
+    volumes:
+      - ./scripts:/scripts
+  shard03a:
+    image: mongo:latest
+    command: mongod --port 27020 --shardsvr --replSet shard03
+    volumes:
+      - ./scripts:/scripts
+  shard03b:
+    image: mongo:latest
+    command: mongod --port 27020 --shardsvr --replSet shard03
+    volumes:
+      - ./scripts:/scripts
+
+  ## Router
+  router:
+    image: mongo:latest
+    command: mongos --port 27017 --configdb configserver/config01:27017 --bind_ip_all
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./scripts:/scripts
+    depends_on:
+      - config01
+      - shard01a
+      - shard01b
+      - shard02a
+      - shard02b
+      - shard03a
+      - shard03b
