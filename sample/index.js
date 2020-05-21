@@ -6,12 +6,15 @@ const url = 'mongodb://localhost:27017';
 const dbName = 'test';
 // Create a new MongoClient
 const client = new MongoClient(url,  { useUnifiedTopology: true } );
+// should be greater than 4 due to test purpose
+const expectedUpsertActionCount = 1000
+const expectedSelectActionCount = 10
+const expectedDeleteActionCount = 10
 
-// Use connect method to connect to the Server
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
 
-
-// const connectionString = 'mongodb://localhost:27017'
-// const MongoClient = require('mongodb').MongoClient(connectionString, { useUnifiedTopology: true })
 function connect(){
   return new Promise((resolve, reject) => {
       client.connect(function(err) {
@@ -29,24 +32,67 @@ function connect(){
 async function init(){
   let db = await connect()
   console.log('First dropping collection cars')
-  if (db.collection('cars'))
-    await db.collection('cars').drop()
-  console.log('Creating collection named "cars"')
-  await db.createCollection("cars")
-  await db.collection("cars").createIndex({id: 1})
   return db
+}
+
+async function insert(db){
+  let count = 0
+  let marked = Date.now()
+  await new Promise((resolve, reject)=>{
+    for(let i=0;i<expectedUpsertActionCount;++i){
+      db.collection('cars').findOneAndUpdate({id: i}, {$set: {name: 'car'+i}}, {upsert: true}).then(
+        res => {
+          count ++
+          if (count >= expectedUpsertActionCount) resolve()
+        }
+      )
+    }
+  })
+  console.log('Time consumed for concurrent for upsertion:', Date.now() - marked, 'ms')
+}
+
+async function select(db){
+  let count = 0
+  let marked = Date.now()
+  await new Promise((resolve, reject)=>{
+    for(let i=0;i<expectedSelectActionCount;++i){
+      lowerBound = getRandomInt(expectedUpsertActionCount)
+      upperBound = lowerBound + getRandomInt(expectedUpsertActionCount-lowerBound+1)
+      db.collection('cars').find({id: {$gt: lowerBound, $lt: upperBound}}).toArray().then(
+        res => {
+          count ++
+          if (count >= expectedSelectActionCount) resolve()
+        }
+      )
+    }
+  })
+  console.log('Time consumed for concurrent selection:', Date.now() - marked, 'ms')
+}
+
+async function del(db){
+  let count = 0
+  let marked = Date.now()
+  await new Promise((resolve, reject)=>{
+    for(let i=0;i<expectedDeleteActionCount;++i){
+      lowerBound = getRandomInt(expectedUpsertActionCount)
+      upperBound = lowerBound + getRandomInt(expectedUpsertActionCount-lowerBound+1)
+      db.collection('cars').deleteMany({id: {$gt: lowerBound, $lt: upperBound}}).then(
+        res => {
+          count ++
+          if (count >= expectedDeleteActionCount) resolve()
+        }
+      )
+    }
+  })
+  console.log('Time consumed for concurrent deletion:', Date.now() - marked, 'ms')
 }
 
 async function main(){
   let db = await init()
   console.log('Insert sample documents')
-  for(let i=0;i<10;++i){
-    console.log(`Inserting car ${i}-th`)
-    await db.collection('cars').insertOne({id: i, name: 'car'+i})
-  }
-  console.log('Query again ...')
-  console.log(await db.collection('cars').find({}).toArray())
-  console.log('Query distribution information ...')
+  await insert(db)
+  await select(db)
+  await del(db)
 }
 
 
