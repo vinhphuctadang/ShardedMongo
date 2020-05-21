@@ -1,4 +1,4 @@
-const MongoClient = require('mongodb').MongoClient;
+  const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 // Connection URL
 const url = 'mongodb://localhost:27017';
@@ -8,8 +8,8 @@ const dbName = 'test';
 const client = new MongoClient(url,  { useUnifiedTopology: true } );
 // should be greater than 4 due to test purpose
 const expectedUpsertActionCount = 1000
-const expectedSelectActionCount = 10
-const expectedDeleteActionCount = 10
+const expectedSelectActionCount = 1000
+const expectedDeleteActionCount = 1000
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
