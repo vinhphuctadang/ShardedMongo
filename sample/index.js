@@ -89,10 +89,13 @@ async function del(db){
 
 async function main(){
   let db = await init()
-  console.log('Insert sample documents')
+  console.log('Times for upsertion:', expectedUpsertActionCount)
+  console.log('Times for selection:', expectedSelectActionCount)
+  console.log('Times for deletion :', expectedDeleteActionCount)
   await insert(db)
   await select(db)
   await del(db)
+  console.log('Done testing')
 }
 
 

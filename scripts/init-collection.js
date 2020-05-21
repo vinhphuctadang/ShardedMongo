@@ -3,5 +3,5 @@ use test
 db.cars.drop() // drop collection for creation safety
 db.createCollection('cars')
 db.cars.createIndex({id:1}, {unique: true})
-sh.shardCollection('test.cars', {id: 'hashed'}, true, {numInitialChunks: 3})
+sh.shardCollection('test.cars', {id: 'hashed'}, false, {numInitialChunks: 3})
 db.cars.getShardDistribution()
