@@ -19,12 +19,14 @@ See comments in ```init.sh``` for details
 
 - Create a collection and 'sharding' it, example have already run in ```./init.sh```
   Some referred documents:
-  - rs.initiate: https://docs.mongodb.com/manual/reference/method/rs.initiate/
+  - rs.initiate: https://docs.mongodb.com/manual/reference/method/rs.initiate/, as is documented there, rs.initiate must run on ONLY one mongod instance for the replica set
   - about mongod: https://docs.mongodb.com/manual/reference/program/mongod/
 To create your own 'sharded' collection (see ./scripts/init-collection.sh as an example):
 
+```
 use test // use the 'test' database (or a database named 'test')
-db.createCollection('<collection name>')
-db.cars.createIndex({<field_for_indexing>: 1}, {unique: true})
+db.createCollection('<collection name>') // create a collection named <collection name>
+db.cars.createIndex({<field_for_indexing>: 1}, {unique: true}) // create an index for created collection 
 sh.shardCollection('test.<collection name>', {<field_for_indexing>: <'hashed' or 1>}, false, {numInitialChunks: <number_of_chunk for 'hashed' index for sharding type}), see document at https://docs.mongodb.com/manual/reference/method/sh.shardCollection/
-db.cars.getShardDistribution()
+db.cars.getShardDistribution() // see distribution status
+```
