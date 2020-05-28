@@ -63,11 +63,12 @@ To turn off mongod service:
 sudo service mongod stop
 ```
 
-Sometimes, port 27018, 27019, 27020 are binded, we should check for processes which bind those port to kill them (the process) in order to make docker binds those port. We have another choice: Edit my configuration where ports should be changed
+Sometimes, port 27017 are binded, we should check for processes which bind the port to kill them (the process) in order to make docker binds the port. We have another choice: Edit my configuration where port 27017 should be changed
 
 ### Common problems
 - You cannot run the ./init.sh
 You maybe stucked at one of the problems:
+  - Add execution privilege ```sudo chmod +x ./init.sh```
   - docker-compose not installed:
 	Check docker (and docker-compose, on linux, on windows/macos check docker desktop version) or try re-installing docker and docker-compose and run them with 'sudo' privilege (or run as administrator)
 
