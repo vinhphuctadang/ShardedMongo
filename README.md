@@ -3,7 +3,7 @@ Repository for demonstrating mongo with shared options for server side better pe
 
 **This is my personal configuration which may not suitable for production mode**
 
-In this demo, the 'sharded' database has 3 sharded server, 1 config server (it should be 3 config server, one for each replica set, but 1 is used for demo purpose) and a mongo router (to distribute queries to shards)
+In this demo, the 'sharded' database has 2 sharded servers, 2 config server and a mongo router (to distribute queries to shards)
 
 ## Prerequisite:
 - docker
@@ -52,7 +52,7 @@ To create **your own 'sharded'** collection (see ./scripts/init-collection.sh as
 ```
 use test // use the 'test' database (or a database named 'test')
 db.createCollection('<collection name>') // create a collection named <collection name>
-db.cars.createIndex({<field_for_indexing>: 1}, {unique: true}) // create an index for created collection 
+db.cars.createIndex({<field_for_indexing>: 1}, {unique: true}) // create an index for created collection
 sh.shardCollection('test.<collection name>', {<field_for_indexing>: <'hashed' or 1>}, false, {numInitialChunks: <number_of_chunk for 'hashed' index for sharding type}), see document at https://docs.mongodb.com/manual/reference/method/sh.shardCollection/
 db.cars.getShardDistribution() // see distribution status
 ```

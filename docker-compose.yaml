@@ -1,56 +1,72 @@
 version: '2'
 services:
   ## 1 Config Servers
-  config01:
+  config-0:
+    container_name: config-0
     image: mongo:latest
     command: mongod --port 27017 --configsvr --replSet configserver
     volumes:
       - ./scripts:/scripts
-  ## 3 Shards
-  shard01a:
+    networks:
+      - sharded_mongo
+  config-1:
+    container_name: config-1
     image: mongo:latest
-    command: mongod --port 27018 --shardsvr --replSet shard01
+    command: mongod --port 27017 --configsvr --replSet configserver
     volumes:
       - ./scripts:/scripts
-  shard01b:
+    networks:
+      - sharded_mongo
+  ## 2 Shards, 2 replica for each shards
+  shard0-0:
     image: mongo:latest
-    command: mongod --port 27018 --shardsvr --replSet shard01
+    container_name: shard0-0
+    command: mongod --port 27017 --shardsvr --replSet shard0
     volumes:
       - ./scripts:/scripts
-  shard02a:
+    networks:
+      - sharded_mongo
+  shard0-1:
     image: mongo:latest
-    command: mongod --port 27019 --shardsvr --replSet shard02
+    container_name: shard0-1
+    command: mongod --port 27017 --shardsvr --replSet shard0
     volumes:
       - ./scripts:/scripts
-  shard02b:
+    networks:
+      - sharded_mongo
+  shard1-0:
     image: mongo:latest
-    command: mongod --port 27019 --shardsvr --replSet shard02
+    container_name: shard1-0
+    command: mongod --port 27017 --shardsvr --replSet shard1
     volumes:
       - ./scripts:/scripts
-  shard03a:
+    networks:
+      - sharded_mongo
+  shard1-1:
     image: mongo:latest
-    command: mongod --port 27020 --shardsvr --replSet shard03
+    container_name: shard1-1
+    command: mongod --port 27017 --shardsvr --replSet shard1
     volumes:
       - ./scripts:/scripts
-  shard03b:
-    image: mongo:latest
-    command: mongod --port 27020 --shardsvr --replSet shard03
-    volumes:
-      - ./scripts:/scripts
-
+    networks:
+      - sharded_mongo
   ## Router
   router:
     image: mongo:latest
-    command: mongos --port 27017 --configdb configserver/config01:27017 --bind_ip_all
+    container_name: mongo
+    command: mongos --port 27017 --configdb configserver/config-0:27017,config-1:27017 --bind_ip_all
     ports:
       - "27017:27017"
     volumes:
       - ./scripts:/scripts
     depends_on:
-      - config01
-      - shard01a
-      - shard01b
-      - shard02a
-      - shard02b
-      - shard03a
-      - shard03b
+      - config-0
+      - config-1
+      - shard0-0
+      - shard0-1
+      - shard1-0
+      - shard1-1
+    networks:
+      - sharded_mongo
+networks:
+  sharded_mongo:
