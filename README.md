@@ -63,6 +63,17 @@ To turn off mongod service:
 sudo service mongod stop
 ```
 
+- Delete all mongo components:
+```
+docker-compose down
+```
+
+If you want your volume to be deleted, simply type:
+
+```
+docker-compose down --volumes # ok but not recommended in production
+```
+
 Sometimes, port 27017 are binded, we should check for processes which bind the port to kill them (the process) in order to make docker binds the port. We have another choice: Edit my configuration where port 27017 should be changed
 
 ### Common problems
