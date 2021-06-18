@@ -1,5 +1,5 @@
 # ShardedMongo
-Repository for demonstrating mongo with shared options for server side better performance
+Repository for demonstrating mongo with shards for tuning up server side performance
 
 **This is my personal configuration which may not suitable for production mode**
 
